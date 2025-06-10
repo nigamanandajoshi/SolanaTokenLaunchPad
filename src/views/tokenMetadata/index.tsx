@@ -35,7 +35,7 @@ interface TokenMetadata {
   };
 }
 
-export const TokenMetadataView: FC<TokenMetadataViewProps> = ({ 
+export const TokenMetadata: FC<TokenMetadataViewProps> = ({ 
   mintAddress, 
   setOpenMetadataModal 
 }) => {
