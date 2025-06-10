@@ -7,5 +7,5 @@ export {FaqView} from "./faq";
 // export {DonateView} from "./donate";
 export {CreateView} from "./create";
 // export {InputView} from "./input";
-//export {TokenMetadataView} from "./tokenMetadata";
+export {TokenMetadata} from "./tokenMetadata";
 // export {ContactView} from "./contact";
