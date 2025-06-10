@@ -21,9 +21,8 @@ import { notify } from "../../utils/notifications";
 import { ClipLoader } from 'react-spinners';
 import { useNetworkConfiguration } from 'contexts/NetworkConfigurationProvider';
 
-// UI Components
 import { AiOutlineClose } from "react-icons/ai";
-import { FaUpload, FaLink, FaCoins, FaInfoCircle } from 'react-icons/fa';
+import { FaUpload, FaCoins, FaInfoCircle } from 'react-icons/fa';
 import { MdOutlineToken } from 'react-icons/md';
 
 interface CreateViewProps {
@@ -39,6 +38,8 @@ export const CreateView: FC<CreateViewProps> = ({ setOpenCreateModal }) => {
   const [tokenMintAddress, setTokenMintAddress] = useState<string | undefined>();
   const [isLoading, setIsLoading] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
+  const [formError, setFormError] = useState("");
+  const [customDecimals, setCustomDecimals] = useState<string>("");
 
   const [token, setToken] = useState({
     name: "",
@@ -50,24 +51,32 @@ export const CreateView: FC<CreateViewProps> = ({ setOpenCreateModal }) => {
   });
 
   const handleFormFieldChange = (fieldName, e) => {
-    setToken({ ...token, [fieldName]: e.target.value });
+    if (fieldName === "decimals") {
+      setToken({ ...token, decimals: e.target.value });
+      if (e.target.value === "custom") {
+        setCustomDecimals("");
+      }
+    } else if (fieldName === "customDecimals") {
+      setCustomDecimals(e.target.value);
+      setToken({ ...token, decimals: "custom" });
+    } else {
+      setToken({ ...token, [fieldName]: e.target.value });
+    }
   };
 
-  // Create Token Function
   const createToken = useCallback(async (token) => {
-    if (!publicKey) {
-      notify({ type: "error", message: "Wallet not connected" });
-      return;
-    }
-
     setIsLoading(true);
+    setFormError("");
     const lamports = await getMinimumBalanceForRentExemptMint(connection);
     const mintKeypair = Keypair.generate();
+
+    // Use customDecimals if set
+    const decimalsValue = token.decimals === "custom" && customDecimals !== "" ? Number(customDecimals) : Number(token.decimals);
 
     try {
       const metadataUrl = await uploadMetadata(token);
       if (!metadataUrl) {
-        notify({ type: "error", message: "Metadata upload failed" });
+        setIsLoading(false);
         return;
       }
 
@@ -120,7 +129,7 @@ export const CreateView: FC<CreateViewProps> = ({ setOpenCreateModal }) => {
         }),
         createInitializeMintInstruction(
           mintKeypair.publicKey,
-          Number(token.decimals),
+          decimalsValue,
           publicKey,
           publicKey,
           TOKEN_PROGRAM_ID
@@ -135,7 +144,7 @@ export const CreateView: FC<CreateViewProps> = ({ setOpenCreateModal }) => {
           mintKeypair.publicKey,
           tokenATA,
           publicKey,
-          Number(token.amount) * Math.pow(10, Number(token.decimals))
+          Number(token.amount) * Math.pow(10, decimalsValue)
         ),
         createMetadataInstruction
       );
@@ -159,7 +168,7 @@ export const CreateView: FC<CreateViewProps> = ({ setOpenCreateModal }) => {
     } finally {
       setIsLoading(false);
     }
-  }, [publicKey, connection, sendTransaction]);
+  }, [publicKey, connection, sendTransaction, customDecimals]);
 
   // Image Upload
   const handleImageChange = async (event) => {
@@ -201,6 +210,7 @@ export const CreateView: FC<CreateViewProps> = ({ setOpenCreateModal }) => {
     const { name, symbol, description, image } = token;
     if (!name || !symbol || !description || !image) {
       notify({ type: "error", message: "Please fill all fields" });
+      setFormError("Please provide all required fields, including uploading a token logo.");
       return "";
     }
 
@@ -226,14 +236,43 @@ export const CreateView: FC<CreateViewProps> = ({ setOpenCreateModal }) => {
       return `https://gateway.pinata.cloud/ipfs/${response.data.IpfsHash}`;
     } catch (error: any) {
       notify({ type: "error", message: "Metadata upload failed" });
+      setFormError("Metadata upload failed.");
       return "";
     }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    // Wallet check
+    if (!publicKey) {
+      setFormError("Please connect your wallet to create a token.");
+      notify({ type: "error", message: "Wallet not connected" });
+      return;
+    }
+    // Validate required fields
+    if (!token.image || !token.name || !token.symbol || !token.description || !token.amount) {
+      setFormError("Please fill in all required fields, including uploading a token logo.");
+      return;
+    }
+    // Validate custom decimals
+    if (token.decimals === "custom") {
+      const val = Number(customDecimals);
+      if (
+        customDecimals === "" ||
+        isNaN(val) ||
+        val < 0 ||
+        val > 18 ||
+        !Number.isInteger(val)
+      ) {
+        setFormError("Please enter a valid custom decimals value (0-18).");
+        return;
+      }
+    }
+    setFormError('');
     createToken(token);
   };
+
+  const isFormDisabled = isLoading || !publicKey;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
@@ -263,7 +302,19 @@ export const CreateView: FC<CreateViewProps> = ({ setOpenCreateModal }) => {
               </p>
             </div>
 
+            {!publicKey && (
+              <div className="rounded bg-yellow-600/90 p-3 text-center text-white font-semibold">
+                Please connect your wallet to create a token.
+              </div>
+            )}
+
             <form onSubmit={handleSubmit} className="space-y-6">
+              {formError && (
+                <div className="mb-4 rounded bg-red-500/80 p-2 text-center text-white">
+                  {formError}
+                </div>
+              )}
+
               {/* Token Image Upload */}
               <div className="flex flex-col items-center">
                 <label className="group relative cursor-pointer">
@@ -288,6 +339,7 @@ export const CreateView: FC<CreateViewProps> = ({ setOpenCreateModal }) => {
                     accept="image/*"
                     onChange={handleImageChange}
                     className="hidden"
+                    disabled={isFormDisabled}
                   />
                 </label>
               </div>
@@ -306,6 +358,7 @@ export const CreateView: FC<CreateViewProps> = ({ setOpenCreateModal }) => {
                     placeholder="My Awesome Token"
                     className="w-full rounded-lg border border-white/10 bg-default-950/50 p-3 text-white focus:border-primary focus:outline-none"
                     required
+                    disabled={isFormDisabled}
                   />
                 </div>
 
@@ -322,6 +375,7 @@ export const CreateView: FC<CreateViewProps> = ({ setOpenCreateModal }) => {
                     className="w-full rounded-lg border border-white/10 bg-default-950/50 p-3 text-white focus:border-primary focus:outline-none"
                     required
                     maxLength={5}
+                    disabled={isFormDisabled}
                   />
                 </div>
 
@@ -334,12 +388,27 @@ export const CreateView: FC<CreateViewProps> = ({ setOpenCreateModal }) => {
                     value={token.decimals}
                     onChange={(e) => handleFormFieldChange("decimals", e)}
                     className="w-full rounded-lg border border-white/10 bg-default-950/50 p-3 text-white focus:border-primary focus:outline-none"
+                    disabled={isFormDisabled}
                   >
                     <option value="0">0 (NFT-like)</option>
                     <option value="6">6 (Like SOL)</option>
                     <option value="9">9 (Default)</option>
                     <option value="18">18 (Like ETH)</option>
+                    <option value="custom">Custom</option>
                   </select>
+                  {token.decimals === "custom" && (
+                    <input
+                      type="number"
+                      min="0"
+                      max="18"
+                      placeholder="Enter custom decimals"
+                      value={customDecimals}
+                      onChange={(e) => handleFormFieldChange("customDecimals", e)}
+                      className="w-full rounded-lg border border-yellow-400/30 bg-default-950/50 p-3 text-white focus:border-primary focus:outline-none mt-2"
+                      disabled={isFormDisabled}
+                      required
+                    />
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -355,6 +424,7 @@ export const CreateView: FC<CreateViewProps> = ({ setOpenCreateModal }) => {
                     className="w-full rounded-lg border border-white/10 bg-default-950/50 p-3 text-white focus:border-primary focus:outline-none"
                     required
                     min="1"
+                    disabled={isFormDisabled}
                   />
                 </div>
 
@@ -370,6 +440,7 @@ export const CreateView: FC<CreateViewProps> = ({ setOpenCreateModal }) => {
                     className="w-full rounded-lg border border-white/10 bg-default-950/50 p-3 text-white focus:border-primary focus:outline-none"
                     rows={3}
                     required
+                    disabled={isFormDisabled}
                   />
                 </div>
               </div>
@@ -377,7 +448,7 @@ export const CreateView: FC<CreateViewProps> = ({ setOpenCreateModal }) => {
               <div className="flex justify-center pt-4">
                 <button
                   type="submit"
-                  disabled={isLoading}
+                  disabled={isFormDisabled}
                   className="flex items-center justify-center rounded-full bg-primary px-8 py-3 font-medium text-white transition-all hover:bg-primary/90 disabled:opacity-50"
                 >
                   {isLoading ? "Creating..." : "Create Token"}
