@@ -10,10 +10,10 @@ import {
   OfferView,
   FaqView,
   CreateView,
-  TokenMetadata,
-  ContactView,
-  AirdropView,
-  DonateView,
+  // TokenMetadata,
+  // ContactView,
+  // AirdropView,
+  // DonateView,
 } from "../views";
 
 const Home: NextPage = (props)=> {
