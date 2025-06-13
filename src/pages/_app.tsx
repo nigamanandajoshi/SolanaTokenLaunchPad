@@ -5,6 +5,7 @@ import {ContextProvider} from '../contexts/ContextProvider';
 import AppBar from '../components/AppBar';
 import { Footer } from '../components/Footer';
 import Notifications from '../components/Notification';
+import { Analytics } from '@vercel/analytics/react';
 
 require("@solana/wallet-adapter-react-ui/styles.css");
 require('../styles/globals.css');
@@ -21,6 +22,7 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
        <Footer />
         <Notifications />
       </ContextProvider>
+       <Analytics />
       {/* //SCRIPTs*/}
       <script src="assets/libs/preline/preline.js"></script>
       <script src="assets/libs/swiper/swiper_bundle.min.js"></script>
