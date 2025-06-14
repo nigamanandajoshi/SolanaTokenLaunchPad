@@ -10,7 +10,7 @@ import {
   OfferView,
   FaqView,
   CreateView,
-
+  TokenMetadata,
   // ContactView,
   // AirdropView,
   // DonateView,
@@ -59,13 +59,13 @@ const Home: NextPage = (props)=> {
         </div>
       )}
 
-     {/*  {openTokenMetaData &&(
+      {openTokenMetaData &&(
         <div className='new_loader relative h-full bg-slate-900'>
           <TokenMetadata setOpenTokenMetaData={setOpenTokenMetaData}/>
         </div>
       )}
 
-      {openContact &&(
+      {/* {openContact &&(
         <div className='new_loader relative h-full bg-slate-900'>
           <ContactView setOpenContact={setOpenContact}/>
         </div>

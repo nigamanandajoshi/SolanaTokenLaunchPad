@@ -1,370 +1,549 @@
-import React, { FC, useEffect, useState } from 'react';
+// // import React, { FC, useCallback, useEffect, useState } from 'react';
+// // import { PublicKey } from '@solana/web3.js';
+// // import { useConnection, useWallet } from '@solana/wallet-adapter-react';
+// // import { Metadata, PROGRAM_ID } from "@metaplex-foundation/mpl-token-metadata";
+// // import axios from 'axios';
+// // import { ClipLoader } from 'react-spinners';
+// // import { notify } from "../../utils/notifications";
+// // import { AiOutlineClose } from 'react-icons/ai';
+
+// // interface TokenMetadataProps {
+// //   setOpenTokenMetaData: (open: boolean) => void;
+// // }
+
+// // export const TokenMetadata: FC<TokenMetadataProps> = ({ setOpenTokenMetaData }) => {
+// //   const { connection } = useConnection();
+// //   const [tokenAddress, seTokenAddress] = useState("");
+// //   const [TokenMetadata, setTokenMetadata] = useState(null);
+// //   const [loaded, setLoaded] = useState(false);
+// //   const [isLoading, setIsLoading] = useState(false);
+
+
+// //   const getMetadata = useCallback(async (form)=>{
+// //     setIsLoading(true);
+// //     try{
+// //       const tokenMint =new PublicKey(form);
+// //       const metadataPDA = PublicKey.findProgramAddressSync(
+// //         [
+// //           Buffer.from("metadata"),
+// //           PROGRAM_ID.toBuffer(),
+// //           tokenMint.toBuffer(),
+// //         ],
+// //         PROGRAM_ID
+// //       )[0];
+
+// //       const metadataAccount = await connection.getAccountInfo(metadataPDA);
+// //       const [metadata, _] = await Metadata.deserialize(metadataAccount.data);
+
+// //       let logoRes = await fetch(metadata.data.uri);
+// //       let logoJson = await logoRes.json();
+// //       let {image} = logoJson;
+
+// //       setTokenMetadata({TokenMetadata, ...metadata.data});
+// //       setLogo(image);
+// //       setIsLoading(false);
+// //       setLoaded(true);
+// //       setTokenMetadata('');
+// //       notify({
+// //         type: "succes",
+// //         message: "Successfully fetch token Metadata",
+// //       });
+// //     } catch (error: any){
+// //       notify({
+// //         type: "error",
+// //         message: "Token Metadata Failed",
+// //       });
+// //       setIsLoading(false);
+// //     }
+// //   },
+// //   [tokenAddress]
+// // );
+
+// // //component
+
+// // const CloseModal = ()=> <a onClick={()=> setOpenTokenMetaData(false)}
+// // className='group mt-4 inline-flex h-10 items-center justify-center
+// // rounded-lg bg-white/20 backdroop-blur-2xl transition-all duration-500
+// // hover:bg-blue-600/60'>
+// //   <i className='text-2xl text-white gropu-hover:text-white'>
+// //   <AiOutlineClose/>  
+// //   </i>
+// // </a>
+
+// //   return (
+// //     <div>
+// //       {/* Your component JSX goes here */}
+// //       <h2>Token Metadata</h2>
+// //     </div>
+// //   );
+// // };
+// // const [logo, setLogo] = useState<string | null>(null);
+
+// import React, { FC, useCallback, useEffect, useState } from 'react';
+// import { PublicKey } from '@solana/web3.js';
+// import { useConnection, useWallet } from '@solana/wallet-adapter-react';
+// import { Metadata, PROGRAM_ID } from "@metaplex-foundation/mpl-token-metadata";
+// import axios from 'axios';
+// import { ClipLoader } from 'react-spinners';
+// import { notify } from "../../utils/notifications";
+// import { AiOutlineClose } from 'react-icons/ai';
+
+// interface TokenMetadataProps {
+//   setOpenTokenMetaData: (open: boolean) => void;
+// }
+
+// export const TokenMetadata: FC<TokenMetadataProps> = ({ setOpenTokenMetaData }) => {
+//   const { connection } = useConnection();
+//   const [tokenAddress, setTokenAddress] = useState("");
+//   const [tokenMetadata, setTokenMetadata] = useState<any>(null);
+//   const [loaded, setLoaded] = useState(false);
+//   const [isLoading, setIsLoading] = useState(false);
+//   const [logo, setLogo] = useState<string | null>(null);
+
+//   const getMetadata = useCallback(async (mintAddress: string) => {
+//     setIsLoading(true);
+//     try {
+//       const tokenMint = new PublicKey(mintAddress);
+//       const metadataPDA = PublicKey.findProgramAddressSync(
+//         [
+//           Buffer.from("metadata"),
+//           PROGRAM_ID.toBuffer(),
+//           tokenMint.toBuffer(),
+//         ],
+//         PROGRAM_ID
+//       )[0];
+
+//       const metadataAccount = await connection.getAccountInfo(metadataPDA);
+//       if (!metadataAccount) {
+//         throw new Error("No metadata account found");
+//       }
+      
+//       const [metadata, _] = await Metadata.deserialize(metadataAccount.data);
+
+//       let logoRes = await fetch(metadata.data.uri);
+//       let logoJson = await logoRes.json();
+//       let { image } = logoJson;
+
+//       setTokenMetadata({ ...metadata.data });
+//       setLogo(image);
+//       setLoaded(true);
+//       notify({
+//         type: "success",
+//         message: "Successfully fetched token Metadata",
+//       });
+//     } catch (error: any) {
+//       notify({
+//         type: "error",
+//         message: "Token Metadata Failed: " + error.message,
+//       });
+//     } finally {
+//       setIsLoading(false);
+//     }
+//   }, [connection]);
+
+//   const handleSubmit = (e: React.FormEvent) => {
+//     e.preventDefault();
+//     if (tokenAddress.trim()) {
+//       getMetadata(tokenAddress);
+//     }
+//   };
+
+//   const CloseModal = () => (
+//     <a 
+//       onClick={() => setOpenTokenMetaData(false)}
+//       className='group mt-4 inline-flex h-10 items-center justify-center
+//       rounded-lg bg-white/20 backdrop-blur-2xl transition-all duration-500
+//       hover:bg-blue-600/60 cursor-pointer'
+//     >
+//       <i className='text-2xl text-white group-hover:text-white'>
+//         <AiOutlineClose/>  
+//       </i>
+//     </a>
+//   );
+
+//   return (
+//     <div className="p-4 text-white">
+//       <div className="flex justify-between items-center mb-4">
+//         <h2 className="text-2xl font-bold">Token Metadata</h2>
+//         <CloseModal />
+//       </div>
+
+//       <form onSubmit={handleSubmit} className="mb-6">
+//         <div className="flex flex-col space-y-4">
+//           <input
+//             type="text"
+//             value={tokenAddress}
+//             onChange={(e) => setTokenAddress(e.target.value)}
+//             placeholder="Enter Token Mint Address"
+//             className="px-4 py-2 bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+//             required
+//           />
+//           <button
+//             type="submit"
+//             disabled={isLoading}
+//             className="px-4 py-2 bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 flex justify-center items-center"
+//           >
+//             {isLoading ? (
+//               <ClipLoader color="#ffffff" size={20} />
+//             ) : (
+//               "Fetch Metadata"
+//             )}
+//           </button>
+//         </div>
+//       </form>
+
+//       {loaded && tokenMetadata && (
+//         <div className="bg-gray-800 p-6 rounded-lg">
+//           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+//             {logo && (
+//               <div className="flex justify-center">
+//                 <img 
+//                   src={logo} 
+//                   alt="Token Logo" 
+//                   className="w-32 h-32 rounded-full object-cover"
+//                 />
+//               </div>
+//             )}
+//             <div>
+//               <h3 className="text-xl font-semibold mb-4">Token Information</h3>
+//               <div className="space-y-2">
+//                 <p><span className="font-medium">Name:</span> {tokenMetadata.name}</p>
+//                 <p><span className="font-medium">Symbol:</span> {tokenMetadata.symbol}</p>
+//                 <p><span className="font-medium">Seller Fee Basis Points:</span> {tokenMetadata.sellerFeeBasisPoints}</p>
+//                 <p>
+//                   <span className="font-medium">URI:</span>{" "}
+//                   <a href={tokenMetadata.uri} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">
+//                     {tokenMetadata.uri}
+//                   </a>
+//                 </p>
+//                 {tokenMetadata.creators && (
+//                   <div>
+//                     <p className="font-medium">Creators:</p>
+//                     <ul className="list-disc pl-5">
+//                       {tokenMetadata.creators.map((creator: any, index: number) => (
+//                         <li key={index}>
+//                           <span className="font-medium">Address:</span> {creator.address.toString()},{" "}
+//                           <span className="font-medium">Verified:</span> {creator.verified ? "Yes" : "No"},{" "}
+//                           <span className="font-medium">Share:</span> {creator.share}%
+//                         </li>
+//                       ))}
+//                     </ul>
+//                   </div>
+//                 )}
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+//     </div>
+//   );
+// };
+
+import React, { FC, useCallback, useState } from 'react';
 import { PublicKey } from '@solana/web3.js';
-import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import { PROGRAM_ID } from "@metaplex-foundation/mpl-token-metadata";
-import axios from 'axios';
+import { useConnection } from '@solana/wallet-adapter-react';
+import { Metadata, PROGRAM_ID } from "@metaplex-foundation/mpl-token-metadata";
 import { ClipLoader } from 'react-spinners';
 import { notify } from "../../utils/notifications";
+import { AiOutlineClose, AiOutlineLink } from 'react-icons/ai';
+import { FiCopy } from 'react-icons/fi';
 
-// Icons
-import { AiOutlineClose } from "react-icons/ai";
-import { FaCopy, FaExternalLinkAlt, FaCoins, FaInfoCircle } from 'react-icons/fa';
-import { MdOutlineToken } from 'react-icons/md';
-import { RiLinksLine } from 'react-icons/ri';
-
-interface TokenMetadataViewProps {
-  mintAddress: string;
-  setOpenMetadataModal: (open: boolean) => void;
+interface TokenMetadataProps {
+  setOpenTokenMetaData: (open: boolean) => void;
 }
 
-interface TokenMetadata {
+interface Creator {
+  address: PublicKey;
+  verified: boolean;
+  share: number;
+}
+
+interface TokenMetadataData {
   name: string;
   symbol: string;
-  description: string;
-  image: string;
-  decimals?: number;
-  supply?: number;
-  mintAddress?: string;
-  metadataUri?: string;
-  links?: {
-    website?: string;
-    twitter?: string;
-    telegram?: string;
-    discord?: string;
-    whitepaper?: string;
-  };
+  uri: string;
+  sellerFeeBasisPoints: number;
+  creators?: Creator[];
+  updateAuthority?: PublicKey;
+  primarySaleHappened?: boolean;
+  isMutable?: boolean;
 }
 
-export const TokenMetadata: FC<TokenMetadataViewProps> = ({ 
-  mintAddress, 
-  setOpenMetadataModal 
-}) => {
+export const TokenMetadata: FC<TokenMetadataProps> = ({ setOpenTokenMetaData }) => {
   const { connection } = useConnection();
-  const { publicKey } = useWallet();
-  const [isLoading, setIsLoading] = useState(true);
-  const [metadata, setMetadata] = useState<TokenMetadata | null>(null);
-  const [tokenBalance, setTokenBalance] = useState<number | null>(null);
-
-  useEffect(() => {
-    const fetchTokenMetadata = async () => {
-      try {
-        setIsLoading(true);
-        
-        // Get on-chain metadata
-        const metadataPDA = PublicKey.findProgramAddressSync(
-          [
-            Buffer.from("metadata"),
-            PROGRAM_ID.toBuffer(),
-            new PublicKey(mintAddress).toBuffer(),
-          ],
-          PROGRAM_ID
-        )[0];
-
-        const metadataAccount = await connection.getAccountInfo(metadataPDA);
-        
-        if (!metadataAccount) {
-          throw new Error("Metadata account not found");
-        }
-
-        // Decode metadata (simplified - in reality you'd use metaplex SDK)
-        const metadataUri = new TextDecoder().decode(metadataAccount.data)
-          .split("\0")
-          .find(part => part.startsWith("http"));
-
-        if (!metadataUri) {
-          throw new Error("Metadata URI not found");
-        }
-
-        // Fetch off-chain metadata
-        const { data } = await axios.get(metadataUri);
-        
-        // Get token supply
-        const mintAccount = await connection.getAccountInfo(new PublicKey(mintAddress));
-        const supply = mintAccount ? parseInt(mintAccount.data.readBigUInt64LE(36).toString()) : 0;
-
-        // Get token balance if wallet is connected
-        let balance = null;
-        if (publicKey) {
-          const tokenAccount = await connection.getTokenAccountsByOwner(publicKey, {
-            mint: new PublicKey(mintAddress),
-          });
-          balance = tokenAccount.value[0]?.account.data.readUInt32LE(64) || 0;
-        }
-
-        setMetadata({
-          ...data,
-          mintAddress,
-          metadataUri,
-          supply,
-          decimals: data.decimals || 9 // Default to 9 decimals if not specified
-        });
-        setTokenBalance(balance);
-
-      } catch (error: any) {
-        console.error("Failed to fetch token metadata:", error);
-        notify({ type: "error", message: `Failed to load token metadata: ${error.message}` });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    if (mintAddress) {
-      fetchTokenMetadata();
-    }
-  }, [mintAddress, connection, publicKey]);
-
-  const formatNumber = (num: number, decimals: number = 0) => {
-    return (num / Math.pow(10, decimals)).toLocaleString(undefined, {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: decimals,
-    });
-  };
+  const [tokenAddress, setTokenAddress] = useState("");
+  const [tokenMetadata, setTokenMetadata] = useState<TokenMetadataData | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [logo, setLogo] = useState<string | null>(null);
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     notify({ type: "success", message: "Copied to clipboard!" });
   };
 
-  const shortenAddress = (address: string) => {
-    return `${address.slice(0, 4)}...${address.slice(-4)}`;
+  const getMetadata = useCallback(async (mintAddress: string) => {
+    setIsLoading(true);
+    setTokenMetadata(null);
+    setLogo(null);
+    
+    try {
+      const tokenMint = new PublicKey(mintAddress);
+      const metadataPDA = PublicKey.findProgramAddressSync(
+        [
+          Buffer.from("metadata"),
+          PROGRAM_ID.toBuffer(),
+          tokenMint.toBuffer(),
+        ],
+        PROGRAM_ID
+      )[0];
+
+      const metadataAccount = await connection.getAccountInfo(metadataPDA);
+      if (!metadataAccount) {
+        throw new Error("No metadata account found");
+      }
+      
+      const [metadata] = await Metadata.deserialize(metadataAccount.data);
+
+      const logoRes = await fetch(metadata.data.uri);
+      const logoJson = await logoRes.json();
+      const { image } = logoJson;
+
+      setTokenMetadata(metadata.data);
+      setLogo(image);
+      
+      notify({
+        type: "success",
+        message: "Successfully fetched token metadata",
+      });
+    } catch (error: any) {
+      notify({
+        type: "error",
+        message: error.message || "Failed to fetch token metadata",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [connection]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (tokenAddress.trim()) {
+      getMetadata(tokenAddress);
+    } else {
+      notify({
+        type: "error",
+        message: "Please enter a token address",
+      });
+    }
   };
 
+  const CloseModal = () => (
+    <button 
+      onClick={() => setOpenTokenMetaData(false)}
+      className="p-2 rounded-full hover:bg-gray-700 transition-colors"
+      aria-label="Close modal"
+    >
+      <AiOutlineClose className="text-xl text-white"/>
+    </button>
+  );
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-      <div className="relative w-full max-w-2xl rounded-2xl bg-gradient-to-br from-default-900 to-default-950 p-6 shadow-xl">
-        <button
-          onClick={() => setOpenMetadataModal(false)}
-          className="absolute right-4 top-4 text-white hover:text-primary"
-        >
-          <AiOutlineClose size={24} />
-        </button>
+    <div className="p-6 text-white max-w-3xl mx-auto">
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">
+            Token Metadata Explorer
+          </h2>
+          <p className="text-gray-400 mt-1">Discover detailed information about any SPL token</p>
+        </div>
+        <CloseModal />
+      </div>
 
-        {isLoading ? (
-          <div className="flex h-64 items-center justify-center">
-            <ClipLoader color="#00ff00" size={50} />
-          </div>
-        ) : metadata ? (
-          <div className="space-y-6">
-            <div className="text-center">
-              <h2 className="text-2xl font-bold text-white">Token Details</h2>
-              <p className="text-default-300 mt-2">
-                View metadata and information for this token
-              </p>
-            </div>
-
-            <div className="flex flex-col items-center">
-              <div className="relative h-32 w-32 overflow-hidden rounded-full border-2 border-primary/50">
-                {metadata.image ? (
-                  <img
-                    src={metadata.image}
-                    alt={`${metadata.name} logo`}
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center bg-default-800">
-                    <MdOutlineToken className="text-4xl text-white/50" />
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="rounded-lg border border-white/10 bg-default-900/50 p-4">
-              <div className="mb-4 grid grid-cols-2 gap-4">
-                <div>
-                  <div className="flex items-center text-sm font-medium text-white">
-                    <MdOutlineToken className="mr-2" />
-                    Name
-                  </div>
-                  <p className="mt-1 text-default-300">{metadata.name}</p>
-                </div>
-                <div>
-                  <div className="flex items-center text-sm font-medium text-white">
-                    <MdOutlineToken className="mr-2" />
-                    Symbol
-                  </div>
-                  <p className="mt-1 text-default-300">{metadata.symbol}</p>
-                </div>
-              </div>
-
-              <div className="mb-4">
-                <div className="flex items-center text-sm font-medium text-white">
-                  <FaInfoCircle className="mr-2" />
-                  Description
-                </div>
-                <p className="mt-1 text-default-300">{metadata.description}</p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <div className="flex items-center text-sm font-medium text-white">
-                    <FaCoins className="mr-2" />
-                    Decimals
-                  </div>
-                  <p className="mt-1 text-default-300">{metadata.decimals}</p>
-                </div>
-                <div>
-                  <div className="flex items-center text-sm font-medium text-white">
-                    <FaCoins className="mr-2" />
-                    Total Supply
-                  </div>
-                  <p className="mt-1 text-default-300">
-                    {formatNumber(metadata.supply || 0, metadata.decimals)} {metadata.symbol}
-                  </p>
-                </div>
-              </div>
-
-              {tokenBalance !== null && (
-                <div className="mt-4">
-                  <div className="flex items-center text-sm font-medium text-white">
-                    <FaCoins className="mr-2" />
-                    Your Balance
-                  </div>
-                  <p className="mt-1 text-default-300">
-                    {formatNumber(tokenBalance, metadata.decimals)} {metadata.symbol}
-                  </p>
-                </div>
+      <form onSubmit={handleSubmit} className="mb-8">
+        <div className="flex flex-col space-y-4">
+          <div>
+            <label htmlFor="tokenAddress" className="block text-sm font-medium mb-2 text-gray-300">
+              Token Mint Address
+            </label>
+            <div className="relative">
+              <input
+                id="tokenAddress"
+                type="text"
+                value={tokenAddress}
+                onChange={(e) => setTokenAddress(e.target.value)}
+                placeholder="Enter Token Mint Address (e.g., 4k3Dyj...)"
+                className="w-full px-4 py-3 bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 border border-gray-700 hover:border-gray-600 transition-all"
+                required
+              />
+              {tokenAddress && (
+                <button
+                  type="button"
+                  onClick={() => copyToClipboard(tokenAddress)}
+                  className="absolute right-3 top-3 text-gray-400 hover:text-white"
+                  title="Copy to clipboard"
+                >
+                  <FiCopy />
+                </button>
               )}
             </div>
+          </div>
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all disabled:opacity-50 flex justify-center items-center space-x-2 font-medium"
+          >
+            {isLoading ? (
+              <>
+                <ClipLoader color="#ffffff" size={20} />
+                <span>Fetching Metadata...</span>
+              </>
+            ) : (
+              "Fetch Metadata"
+            )}
+          </button>
+        </div>
+      </form>
 
-            <div className="rounded-lg border border-white/10 bg-default-900/50 p-4">
-              <div className="mb-2 flex items-center text-sm font-medium text-white">
-                <RiLinksLine className="mr-2" />
-                Token Address
+      {isLoading && (
+        <div className="flex flex-col items-center justify-center py-12">
+          <ClipLoader color="#6366f1" size={60} />
+          <p className="mt-4 text-gray-400">Fetching token metadata...</p>
+        </div>
+      )}
+
+      {!isLoading && tokenMetadata && (
+        <div className="bg-gray-800/50 p-6 rounded-xl border border-gray-700 backdrop-blur-sm">
+          <div className="flex items-start justify-between mb-6">
+            <div>
+              <h3 className="text-2xl font-bold text-white">
+                {tokenMetadata.name}
+              </h3>
+              <div className="flex items-center mt-2 space-x-2">
+                <span className="px-2 py-1 bg-gray-700 rounded-md text-sm font-mono">
+                  {tokenMetadata.symbol}
+                </span>
+                <span className="px-2 py-1 bg-blue-900/30 rounded-md text-sm">
+                  Royalty: {tokenMetadata.sellerFeeBasisPoints / 100}%
+                </span>
               </div>
-              <div className="flex items-center justify-between rounded bg-default-950/50 px-3 py-2">
-                <p className="truncate text-default-300">{shortenAddress(metadata.mintAddress || '')}</p>
-                <div className="flex space-x-2">
-                  <button
-                    onClick={() => copyToClipboard(metadata.mintAddress || '')}
-                    className="text-default-300 hover:text-primary"
+            </div>
+            {logo && (
+              <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-gray-600">
+                <img 
+                  src={logo} 
+                  alt="Token Logo" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <div className="bg-gray-700/50 p-4 rounded-lg">
+                <h4 className="font-medium text-gray-300 mb-2">Metadata URI</h4>
+                <div className="flex items-center">
+                  <a 
+                    href={tokenMetadata.uri} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="text-blue-400 hover:underline break-all flex items-center"
                   >
-                    <FaCopy />
-                  </button>
-                  <a
-                    href={`https://explorer.solana.com/address/${metadata.mintAddress}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-default-300 hover:text-primary"
-                  >
-                    <FaExternalLinkAlt />
+                    {tokenMetadata.uri.length > 30 
+                      ? `${tokenMetadata.uri.substring(0, 30)}...` 
+                      : tokenMetadata.uri}
+                    <AiOutlineLink className="ml-1" />
                   </a>
                 </div>
               </div>
 
-              {metadata.metadataUri && (
-                <>
-                  <div className="mt-4 mb-2 flex items-center text-sm font-medium text-white">
-                    <RiLinksLine className="mr-2" />
-                    Metadata URI
-                  </div>
-                  <div className="flex items-center justify-between rounded bg-default-950/50 px-3 py-2">
-                    <p className="truncate text-default-300">
-                      {metadata.metadataUri.length > 30 
-                        ? `${metadata.metadataUri.substring(0, 15)}...${metadata.metadataUri.substring(metadata.metadataUri.length - 15)}`
-                        : metadata.metadataUri}
-                    </p>
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => copyToClipboard(metadata.metadataUri || '')}
-                        className="text-default-300 hover:text-primary"
-                      >
-                        <FaCopy />
-                      </button>
-                      <a
-                        href={metadata.metadataUri}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-default-300 hover:text-primary"
-                      >
-                        <FaExternalLinkAlt />
-                      </a>
-                    </div>
-                  </div>
-                </>
-              )}
-            </div>
-
-            {(metadata.links?.website || metadata.links?.twitter || metadata.links?.telegram || metadata.links?.discord || metadata.links?.whitepaper) && (
-              <div className="rounded-lg border border-white/10 bg-default-900/50 p-4">
-                <div className="mb-3 flex items-center text-sm font-medium text-white">
-                  <RiLinksLine className="mr-2" />
-                  Links
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {metadata.links?.website && (
-                    <a
-                      href={metadata.links.website}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center rounded-full border border-white/10 bg-default-950/50 px-4 py-2 text-sm text-white transition-all hover:bg-white/10"
-                    >
-                      <FaExternalLinkAlt className="mr-2" size={12} />
-                      Website
-                    </a>
-                  )}
-                  {metadata.links?.twitter && (
-                    <a
-                      href={metadata.links.twitter}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center rounded-full border border-white/10 bg-default-950/50 px-4 py-2 text-sm text-white transition-all hover:bg-white/10"
-                    >
-                      <FaExternalLinkAlt className="mr-2" size={12} />
-                      Twitter
-                    </a>
-                  )}
-                  {metadata.links?.telegram && (
-                    <a
-                      href={metadata.links.telegram}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center rounded-full border border-white/10 bg-default-950/50 px-4 py-2 text-sm text-white transition-all hover:bg-white/10"
-                    >
-                      <FaExternalLinkAlt className="mr-2" size={12} />
-                      Telegram
-                    </a>
-                  )}
-                  {metadata.links?.discord && (
-                    <a
-                      href={metadata.links.discord}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center rounded-full border border-white/10 bg-default-950/50 px-4 py-2 text-sm text-white transition-all hover:bg-white/10"
-                    >
-                      <FaExternalLinkAlt className="mr-2" size={12} />
-                      Discord
-                    </a>
-                  )}
-                  {metadata.links?.whitepaper && (
-                    <a
-                      href={metadata.links.whitepaper}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center rounded-full border border-white/10 bg-default-950/50 px-4 py-2 text-sm text-white transition-all hover:bg-white/10"
-                    >
-                      <FaExternalLinkAlt className="mr-2" size={12} />
-                      Whitepaper
-                    </a>
-                  )}
+              <div className="bg-gray-700/50 p-4 rounded-lg">
+                <h4 className="font-medium text-gray-300 mb-2">Token Address</h4>
+                <div className="flex items-center">
+                  <p className="font-mono text-sm break-all mr-2">
+                    {tokenAddress.substring(0, 6)}...{tokenAddress.slice(-4)}
+                  </p>
+                  <button 
+                    onClick={() => copyToClipboard(tokenAddress)}
+                    className="text-gray-400 hover:text-white"
+                    title="Copy to clipboard"
+                  >
+                    <FiCopy size={14} />
+                  </button>
                 </div>
               </div>
-            )}
+            </div>
 
-            <div className="flex justify-center pt-2">
-              <button
-                onClick={() => setOpenMetadataModal(false)}
-                className="rounded-full border border-white/10 bg-transparent px-8 py-3 font-medium text-white transition-all hover:bg-white/10"
-              >
-                Close
-              </button>
+            <div className="bg-gray-700/50 p-4 rounded-lg">
+              <h4 className="font-medium text-gray-300 mb-3">Details</h4>
+              <div className="space-y-3">
+                {tokenMetadata.updateAuthority && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Update Authority</span>
+                    <div className="flex items-center">
+                      <span className="font-mono text-sm">
+                        {tokenMetadata.updateAuthority.toString().substring(0, 6)}...{tokenMetadata.updateAuthority.toString().slice(-4)}
+                      </span>
+                      <button 
+                        onClick={() => copyToClipboard(tokenMetadata.updateAuthority.toString())}
+                        className="text-gray-400 hover:text-white ml-1"
+                        title="Copy to clipboard"
+                      >
+                        <FiCopy size={12} />
+                      </button>
+                    </div>
+                  </div>
+                )}
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Primary Sale</span>
+                  <span>{tokenMetadata.primarySaleHappened ? "✅ Completed" : "❌ Pending"}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Is Mutable</span>
+                  <span>{tokenMetadata.isMutable ? "✅ Yes" : "❌ No"}</span>
+                </div>
+              </div>
             </div>
           </div>
-        ) : (
-          <div className="flex h-64 items-center justify-center">
-            <p className="text-default-300">Failed to load token metadata</p>
-          </div>
-        )}
-      </div>
+
+          {tokenMetadata.creators && tokenMetadata.creators.length > 0 && (
+            <div className="mt-8">
+              <h4 className="font-semibold text-lg mb-4">Creators</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {tokenMetadata.creators.map((creator, index) => (
+                  <div key={index} className="bg-gray-700 p-4 rounded-lg border border-gray-600/50">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <div className="flex items-center mb-1">
+                          <p className="font-mono text-sm break-all mr-2">
+                            {creator.address.toString().substring(0, 6)}...{creator.address.toString().slice(-4)}
+                          </p>
+                          <button 
+                            onClick={() => copyToClipboard(creator.address.toString())}
+                            className="text-gray-400 hover:text-white"
+                            title="Copy to clipboard"
+                          >
+                            <FiCopy size={12} />
+                          </button>
+                        </div>
+                        <div className="flex space-x-2">
+                          <span className={`px-2 py-1 text-xs rounded-full ${creator.verified ? 'bg-green-900/30 text-green-400' : 'bg-yellow-900/30 text-yellow-400'}`}>
+                            {creator.verified ? 'Verified' : 'Unverified'}
+                          </span>
+                          <span className="px-2 py-1 bg-blue-900/30 text-blue-400 text-xs rounded-full">
+                            Share: {creator.share}%
+                          </span>
+                        </div>
+                      </div>
+                      <span className="text-gray-400 text-sm">#{index + 1}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };
