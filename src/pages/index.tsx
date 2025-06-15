@@ -12,7 +12,7 @@ import {
   CreateView,
   TokenMetadata,
   // ContactView,
-  // AirdropView,
+  AirdropView,
   // DonateView,
 } from "../views";
 
@@ -27,7 +27,7 @@ const Home: NextPage = (props)=> {
   return (
     <>
     <Head>
-      <title>Solana Token Creator</title>
+      <title>Solana Token LunchPad</title>
       <meta 
       name='Solana token lunchpad'
       content='Create and lunch your Solana token'
@@ -65,7 +65,7 @@ const Home: NextPage = (props)=> {
         </div>
       )}
 
-      {/* {openContact &&(
+       {openContact &&(
         <div className='new_loader relative h-full bg-slate-900'>
           <ContactView setOpenContact={setOpenContact}/>
         </div>
@@ -77,7 +77,7 @@ const Home: NextPage = (props)=> {
         </div>
       )}
 
-      {openSendTransaction &&(
+     {/* {openSendTransaction &&(
         <div className='new_loader relative h-full bg-slate-900'>
           <DonateView setOpenSendTransaction={setOpenSendTransaction}/>
         </div>
