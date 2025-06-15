@@ -11,7 +11,7 @@ import {
   FaqView,
   CreateView,
   TokenMetadata,
-  // ContactView,
+  ContactView,
   AirdropView,
   // DonateView,
 } from "../views";
