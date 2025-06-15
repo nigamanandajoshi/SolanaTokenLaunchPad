@@ -8,4 +8,4 @@ export {AirdropView} from "./airdrop";
 export {CreateView} from "./create";
 // export {InputView} from "./input";
 export {TokenMetadata} from "./tokenMetadata";
-// export {ContactView} from "./contact";
+export {ContactView} from "./contact";
