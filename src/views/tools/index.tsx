@@ -187,16 +187,6 @@ export const ToolView: FC<ToolViewProps> = ({
       function: setOpenSendTransaction,
     },
     {
-      name: "Buddy Token",
-      icon: <MdGeneratingTokens size={20} />,
-      function: setOpenSendTransaction,
-    },
-    {
-      name: "Top Token",
-      icon: <MdGeneratingTokens size={20} />,
-      function: setOpenSendTransaction,
-    },
-    {
       name: "Solana Explorer",
       icon: <MdGeneratingTokens size={20} />,
       function: setOpenSendTransaction,
